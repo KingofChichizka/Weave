@@ -1,4 +1,6 @@
-﻿bool DottingVisibility = true;
+﻿int width = 80;
+int height = 22;
+bool DottingVisibility = true;
 bool ColorVisibility = true;
 while (true)
 {
@@ -9,8 +11,6 @@ while (true)
     int colorComplexity = random.Next(2, 6);
     int seed = random.Next();
     Weave weave = new Weave(patternSize, colorComplexity, seed);
-    int height = 22;
-    int width = 80;
     int[,] pattern = weave.ReconstructPattern();
 
     // Set console window size
