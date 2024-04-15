@@ -58,11 +58,22 @@ display:
         else if (pressedKey == ConsoleKey.H)
         {
             Console.Clear();
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @"  ____ ___  __  __ __  __    _    _   _ ____  ____  ");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @" / ___/ _ \|  \/  |  \/  |  / \  | \ | |  _ \/ ___| ");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |  | | | | |\/| | |\/| | / _ \ |  \| | | | \___ \ ");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |__| |_| | |  | | |  | |/ ___ \| |\  | |_| |___) |");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @" \____\___/|_|  |_|_|  |_/_/   \_\_| \_|____/|____/ ");
+            if (width >= 52)
+            {
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @"  ____ ___  __  __ __  __    _    _   _ ____  ____  ");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @" / ___/ _ \|  \/  |  \/  |  / \  | \ | |  _ \/ ___| ");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |  | | | | |\/| | |\/| | / _ \ |  \| | | | \___ \ ");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |__| |_| | |  | | |  | |/ ___ \| |\  | |_| |___) |");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @" \____\___/|_|  |_|_|  |_/_/   \_\_| \_|____/|____/ ");
+            }
+            else
+            {
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine(new string(' ', (width - 8) / 2) + "COMMANDS");
+            }
 
             Console.WriteLine();
             Console.WriteLine();
@@ -83,32 +94,57 @@ display:
             char selectedProperty = 'w';
             while (true)
             {
-
                 Console.Clear();
-                Console.WriteLine(new string(' ', (width - 66) / 2) + @"__        _____ _   _ ____   _____        __  ____ ___ __________ ");
-                Console.WriteLine(new string(' ', (width - 66) / 2) + @"\ \      / /_ _| \ | |  _ \ / _ \ \      / / / ___|_ _|__  / ____|");
-                Console.WriteLine(new string(' ', (width - 66) / 2) + @" \ \ /\ / / | ||  \| | | | | | | \ \ /\ / /  \___ \| |  / /|  _|  ");
-                Console.WriteLine(new string(' ', (width - 66) / 2) + @"  \ V  V /  | || |\  | |_| | |_| |\ V  V /    ___) | | / /_| |___ ");
-                Console.WriteLine(new string(' ', (width - 66) / 2) + @"   \_/\_/  |___|_| \_|____/ \___/  \_/\_/    |____/___/____|_____|");
+                if (width >= 66)
+                {
+                    Console.WriteLine(new string(' ', (width - 66) / 2) + @"__        _____ _   _ ____   _____        __  ____ ___ __________ ");
+                    Console.WriteLine(new string(' ', (width - 66) / 2) + @"\ \      / /_ _| \ | |  _ \ / _ \ \      / / / ___|_ _|__  / ____|");
+                    Console.WriteLine(new string(' ', (width - 66) / 2) + @" \ \ /\ / / | ||  \| | | | | | | \ \ /\ / /  \___ \| |  / /|  _|  ");
+                    Console.WriteLine(new string(' ', (width - 66) / 2) + @"  \ V  V /  | || |\  | |_| | |_| |\ V  V /    ___) | | / /_| |___ ");
+                    Console.WriteLine(new string(' ', (width - 66) / 2) + @"   \_/\_/  |___|_| \_|____/ \___/  \_/\_/    |____/___/____|_____|");
+                }
+                else if (width >= 54)
+                {
+                    Console.WriteLine(new string(' ', (width - 54) / 2) + @"          _           _                     _         ");
+                    Console.WriteLine(new string(' ', (width - 54) / 2) + @"__      _(_)_ __   __| | _____      __  ___(_)_______ ");
+                    Console.WriteLine(new string(' ', (width - 54) / 2) + @"\ \ /\ / / | '_ \ / _` |/ _ \ \ /\ / / / __| |_  / _ \");
+                    Console.WriteLine(new string(' ', (width - 54) / 2) + @" \ V  V /| | | | | (_| | (_) \ V  V /  \__ \ |/ /  __/");
+                    Console.WriteLine(new string(' ', (width - 54) / 2) + @"  \_/\_/ |_|_| |_|\__,_|\___/ \_/\_/   |___/_/___\___|");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine(new string(' ', (width - 11) / 2) + @"WINDOW SIZE");
+                }
 
 
                 Console.WriteLine(new string('\n', (height / 2) - 3 - 5));
-
                 Console.Write($"{new string(' ', width / 3 - 1)}");
-                if(selectedProperty=='w'){Console.BackgroundColor=ConsoleColor.White;Console.ForegroundColor=ConsoleColor.Black;}
+
+                if (selectedProperty == 'w') { Console.BackgroundColor = ConsoleColor.White; Console.ForegroundColor = ConsoleColor.Black; }
                 Console.Write($"width");
                 Console.ResetColor();
                 Console.Write($"{new string(' ', width / 3 - 11)}");
-                if(selectedProperty=='h'){Console.BackgroundColor=ConsoleColor.White;Console.ForegroundColor=ConsoleColor.Black;}
+
+                if (selectedProperty == 'h') { Console.BackgroundColor = ConsoleColor.White; Console.ForegroundColor = ConsoleColor.Black; }
                 Console.Write($"height");
                 Console.ResetColor();
-                Console.WriteLine($"{new string(' ', width / 3 - 1)}");
 
                 Console.WriteLine();
+                Console.WriteLine();
+
                 Console.WriteLine($"{new string(' ', width / 3)}  ↑  {new string(' ', (width / 3) - 10)}  ↑  {new string(' ', width / 3)}");
+
                 Console.Write($"{new string(' ', width / 3 - 1)}");
                 Console.WriteLine($"  {width} {new string(' ', (width / 3) - 10)}  {height}  ");
+
                 Console.WriteLine($"{new string(' ', width / 3)}  ↓  {new string(' ', (width / 3) - 11)}   ↓  {new string(' ', width / 3)}");
+
+                Console.WriteLine(new string('\n', (height / 2) - 3));
+                Console.Write($"{new string('=', (width - 29) / 2)}Press ESC to exit this window{new string('=', (width - 29) / 2)}");
 
                 pressedKey = Console.ReadKey().Key;
                 if (pressedKey == ConsoleKey.UpArrow)
@@ -119,8 +155,8 @@ display:
                 }
                 else if (pressedKey == ConsoleKey.DownArrow)
                 {
-                    if (selectedProperty == 'w') width--;
-                    else if (selectedProperty == 'h') height--;
+                    if (selectedProperty == 'w' && width > 33) width--;
+                    else if (selectedProperty == 'h' && height > 16) height--;
                     Console.SetWindowSize(width, height + 2);
                 }
                 else if (pressedKey == ConsoleKey.RightArrow) selectedProperty = 'h';
