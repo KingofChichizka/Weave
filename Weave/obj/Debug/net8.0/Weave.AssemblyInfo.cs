@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Weave")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ce8ab90e5efcbf5f98b73f046c383bb9be7c702")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fddf10ca9a4f77a72f20a4b2947b115ffa60a80d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Weave")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Weave")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

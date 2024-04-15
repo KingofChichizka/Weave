@@ -115,10 +115,16 @@ public class Settings
 {
     public static int width = 80;
     public static int height = 22;
-    public static int DisplayMode = 0;
+    public static StyleFlag styleFlag;
     public static int patternSize = -1;
     public static int colorComplexity = -1;
     public static int seed = -1;
+    public enum StyleFlag
+    {
+        Normal,
+        NotDotted,
+        NotColored
+    }
 }
 public class Variables
 {
@@ -225,31 +231,26 @@ public class Windows
                 Console.WriteLine();
                 Console.WriteLine(new string(' ', (width - 8) / 2) + "COMMANDS");
             }
-
             Console.WriteLine();
             Console.WriteLine();
-            switch (DisplayMode) 
+            switch (styleFlag) 
             {
-                case -1: Console.WriteLine("[D]\tDisplay mode: Dotted"); break;
-                case 0: Console.WriteLine("[D]\tDisplay mode: Dotted, colored"); break;
-                case 1: Console.WriteLine("[D]\tDisplay mode: Colored"); break;
+                case StyleFlag.Normal: Console.WriteLine("[D]\tDisplay mode: Dotted, colored"); break;
+                case StyleFlag.NotDotted: Console.WriteLine("[D]\tDisplay mode: Colored"); break;
+                case StyleFlag.NotColored: Console.WriteLine("[D]\tDisplay mode: Dotted"); break;
             }
             Console.WriteLine("[R]\tResize window");
-            Console.WriteLine("[S]\tSave pattern");                                                                              //TODO
+            Console.WriteLine("[S]\tSave pattern"); 
             
             Console.WriteLine(new string('\n', (height / 2)));
             Console.Write($"{new string('=', (width - 29) / 2)}Press ESC to exit this window{new string('=', (width - 29) / 2)}");
             
             ConsoleKey pressedKey = Console.ReadKey().Key;
-            if (pressedKey == ConsoleKey.D) DisplayMode = DisplayMode >= 1 ? -1 : DisplayMode += 1;
-            if (pressedKey == ConsoleKey.R) DisplayWindowSizeSettings();
-            if (pressedKey == ConsoleKey.S) 
+            if (pressedKey == ConsoleKey.D) { styleFlag++; if ((int)styleFlag >= 3) styleFlag = 0; }
+            else if (pressedKey == ConsoleKey.R) DisplayWindowSizeSettings();
+            else if (pressedKey == ConsoleKey.S) 
             {
-                using (FileStream fs = File.Create($"Saved/{seed} {patternSize} {colorComplexity}")) 
-                {
-                    Byte[] title = new UTF8Encoding(true).GetBytes($"{seed} {patternSize} {colorComplexity} {weave.OutputPatternAsString()}");
-                    fs.Write(title, 0, title.Length);
-                }
+                SavePattern.SaveTxt();
             }
             if (pressedKey == ConsoleKey.Escape) break;
         }
@@ -261,8 +262,8 @@ public class Windows
         {
             for (int j = 0; j < width; j++)
             {
-                if (DisplayMode >= 0) Console.ForegroundColor = selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]];
-                if (DisplayMode <= 0)
+                if (styleFlag != StyleFlag.NotColored) Console.ForegroundColor = selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]];
+                if (styleFlag != StyleFlag.NotDotted)
                 {
                     switch (pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]%4)
                     {
@@ -280,6 +281,17 @@ public class Windows
         // Prompt user for input
         Console.ResetColor();
         Console.Write($"Seed = {seed}, Size = {weave.size}, Complexity = {colorComplexity}\n[ENTER] Regenerate, [ESC] Leave, [C] Controls");
-
+    }
+}
+public static class SavePattern 
+{
+    public static void SaveTxt() 
+    {
+        Directory.CreateDirectory("Saved");
+        using (FileStream fs = File.Create($@"Saved\w_{seed}_{patternSize}_{colorComplexity}.txt"))
+        {
+            Byte[] title = new UTF8Encoding(true).GetBytes($"{seed} {patternSize} {colorComplexity} {weave.OutputPatternAsString()}");
+            fs.Write(title, 0, title.Length);
+        }
     }
 }
