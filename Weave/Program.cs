@@ -1,12 +1,13 @@
-﻿using static Settings;
+﻿using System.Text;
+using static Settings;
 using static Variables;
 
 while (true)
 {
     // Use variables
-    selectedColors = new ConsoleColor[5];
+    selectedColors = new ConsoleColor[15];
     patternSize = random.Next(2, 14);
-    colorComplexity = random.Next(2, 6);
+    colorComplexity = random.Next(2, 15);
     seed = random.Next();
     weave = new Weave(patternSize, colorComplexity, seed);
     pattern = weave.ReconstructPattern();
@@ -15,7 +16,7 @@ while (true)
     Console.SetWindowSize(width, height + 2);
 
     // Generate unique colors
-    for (int i = 0; i < selectedColors.Length; i++)
+    for (int i = 0; i < colorComplexity; i++)
     {
         ConsoleColor color;
         do { color = (ConsoleColor)random.Next(16); } while (selectedColors.Contains(color));
@@ -29,10 +30,7 @@ while (true)
         ConsoleKey pressedKey = Console.ReadKey().Key;
         if (pressedKey == ConsoleKey.Escape) return;
         else if (pressedKey == ConsoleKey.Enter) break;
-        else if (pressedKey == ConsoleKey.H) Windows.DisplayControls();
-        else if (pressedKey == ConsoleKey.C) ColorVisibility = !ColorVisibility;
-        else if (pressedKey == ConsoleKey.D) DottingVisibility = !DottingVisibility;
-        else if (pressedKey == ConsoleKey.R) Windows.DisplayWindowSizeSettings();
+        else if (pressedKey == ConsoleKey.C) Windows.DisplayControls();
 
     }
     Console.Clear();
@@ -90,6 +88,16 @@ public class Weave
 
         return tile;
     }
+    // Method to output 2D array as a string
+    public string OutputPatternAsString() 
+    {
+        string s = "";
+        foreach (int i in pattern) 
+        {
+            s += i + " ";
+        }
+        return s;
+    }
 
     // Method to calculate the factorial of a number
     private int CalculateFactorial(int number)
@@ -107,8 +115,7 @@ public class Settings
 {
     public static int width = 80;
     public static int height = 22;
-    public static bool DottingVisibility = true;
-    public static bool ColorVisibility = true;
+    public static int DisplayMode = 0;
     public static int patternSize = -1;
     public static int colorComplexity = -1;
     public static int seed = -1;
@@ -199,33 +206,53 @@ public class Windows
     }
     public static void DisplayControls()
     {
-        Console.Clear();
-        if (width >= 52)
+        while (true) 
         {
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @"  ____ ___  __  __ __  __    _    _   _ ____  ____  ");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @" / ___/ _ \|  \/  |  \/  |  / \  | \ | |  _ \/ ___| ");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |  | | | | |\/| | |\/| | / _ \ |  \| | | | \___ \ ");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |__| |_| | |  | | |  | |/ ___ \| |\  | |_| |___) |");
-            Console.WriteLine(new string(' ', (width - 52) / 2) + @" \____\___/|_|  |_|_|  |_/_/   \_\_| \_|____/|____/ ");
-        }
-        else
-        {
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(new string(' ', (width - 8) / 2) + "COMMANDS");
-        }
+            Console.Clear();
+            if (width >= 52)
+            {
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @"  ____ ___  __  __ __  __    _    _   _ ____  ____  ");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @" / ___/ _ \|  \/  |  \/  |  / \  | \ | |  _ \/ ___| ");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |  | | | | |\/| | |\/| | / _ \ |  \| | | | \___ \ ");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @"| |__| |_| | |  | | |  | |/ ___ \| |\  | |_| |___) |");
+                Console.WriteLine(new string(' ', (width - 52) / 2) + @" \____\___/|_|  |_|_|  |_/_/   \_\_| \_|____/|____/ ");
+            }
+            else
+            {
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine(new string(' ', (width - 8) / 2) + "COMMANDS");
+            }
 
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine("C:\tToggle color");
-        Console.WriteLine("D:\tToggle pattern dotting");
-        Console.WriteLine("R:\tResize window");
-        //Console.WriteLine("S:\tSave pattern");                                                                              //TODO
-
-        Console.WriteLine("\nPress any key(except power button) to exit this window");
-        Console.ReadKey();
+            Console.WriteLine();
+            Console.WriteLine();
+            switch (DisplayMode) 
+            {
+                case -1: Console.WriteLine("[D]\tDisplay mode: Dotted"); break;
+                case 0: Console.WriteLine("[D]\tDisplay mode: Dotted, colored"); break;
+                case 1: Console.WriteLine("[D]\tDisplay mode: Colored"); break;
+            }
+            Console.WriteLine("[R]\tResize window");
+            Console.WriteLine("[S]\tSave pattern");                                                                              //TODO
+            
+            Console.WriteLine(new string('\n', (height / 2)));
+            Console.Write($"{new string('=', (width - 29) / 2)}Press ESC to exit this window{new string('=', (width - 29) / 2)}");
+            
+            ConsoleKey pressedKey = Console.ReadKey().Key;
+            if (pressedKey == ConsoleKey.D) DisplayMode = DisplayMode >= 1 ? -1 : DisplayMode += 1;
+            if (pressedKey == ConsoleKey.R) DisplayWindowSizeSettings();
+            if (pressedKey == ConsoleKey.S) 
+            {
+                using (FileStream fs = File.Create($"Saved/{seed} {patternSize} {colorComplexity}")) 
+                {
+                    Byte[] title = new UTF8Encoding(true).GetBytes($"{seed} {patternSize} {colorComplexity} {weave.OutputPatternAsString()}");
+                    fs.Write(title, 0, title.Length);
+                }
+            }
+            if (pressedKey == ConsoleKey.Escape) break;
+        }
     }
     public static void DisplayPattern()
     {
@@ -234,16 +261,15 @@ public class Windows
         {
             for (int j = 0; j < width; j++)
             {
-                if (ColorVisibility) Console.ForegroundColor = selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]];
-                if (DottingVisibility)
+                if (DisplayMode >= 0) Console.ForegroundColor = selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]];
+                if (DisplayMode <= 0)
                 {
-                    switch (pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)])
+                    switch (pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]%4)
                     {
                         case 0: Console.Write("▓"); break;
                         case 1: Console.Write("░"); break;
                         case 2: Console.Write("▒"); break;
                         case 3: Console.Write("█"); break;
-                        case 4: Console.Write(" "); break;
                     }
                 }
                 else Console.Write("█");
@@ -253,7 +279,7 @@ public class Windows
 
         // Prompt user for input
         Console.ResetColor();
-        Console.Write($"Seed = {seed}, Size = {weave.size}, Complexity = {colorComplexity}\nPress any ENTER to regenerate, press ESC to leave, press h for controls");
+        Console.Write($"Seed = {seed}, Size = {weave.size}, Complexity = {colorComplexity}\n[ENTER] Regenerate, [ESC] Leave, [C] Controls");
 
     }
 }
