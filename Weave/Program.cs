@@ -30,8 +30,7 @@ while (true)
         if (pressedKey == ConsoleKey.Escape) return;
         else if (pressedKey == ConsoleKey.Enter) break;
         else if (pressedKey == ConsoleKey.H) Windows.DisplayControls();
-        else if (pressedKey == ConsoleKey.C) ColorVisibility = !ColorVisibility;
-        else if (pressedKey == ConsoleKey.D) DottingVisibility = !DottingVisibility;
+        else if (pressedKey == ConsoleKey.F) { styleFlag++; if ((int)styleFlag >= 3) styleFlag = 0; }
         else if (pressedKey == ConsoleKey.R) Windows.DisplayWindowSizeSettings();
 
     }
@@ -107,11 +106,16 @@ public class Settings
 {
     public static int width = 80;
     public static int height = 22;
-    public static bool DottingVisibility = true;
-    public static bool ColorVisibility = true;
+    public static StyleFlag styleFlag;
     public static int patternSize = -1;
     public static int colorComplexity = -1;
     public static int seed = -1;
+    public enum StyleFlag
+    {
+        Normal,
+        NotDotted,
+        NotColored
+    }
 }
 public class Variables
 {
@@ -219,10 +223,12 @@ public class Windows
 
         Console.WriteLine();
         Console.WriteLine();
-        Console.WriteLine("C:\tToggle color");
-        Console.WriteLine("D:\tToggle pattern dotting");
-        Console.WriteLine("R:\tResize window");
-        //Console.WriteLine("S:\tSave pattern");                                                                              //TODO
+        Console.WriteLine("H:\tShow this help menu");
+        Console.WriteLine("F:\tCycle through style flags");
+        Console.WriteLine("R:\tResize render window");
+        Console.WriteLine("ENTER:\tRegenerates the pattern");
+        Console.WriteLine("ESC:\tExits the program");
+        //Console.WriteLine("S:\tSave pattern");                                                                   //TODO
 
         Console.WriteLine("\nPress any key(except power button) to exit this window");
         Console.ReadKey();
@@ -234,8 +240,8 @@ public class Windows
         {
             for (int j = 0; j < width; j++)
             {
-                if (ColorVisibility) Console.ForegroundColor = selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]];
-                if (DottingVisibility)
+                if (styleFlag != StyleFlag.NotColored) Console.ForegroundColor = selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]];
+                if (styleFlag != StyleFlag.NotDotted)
                 {
                     switch (pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)])
                     {
@@ -253,7 +259,7 @@ public class Windows
 
         // Prompt user for input
         Console.ResetColor();
-        Console.Write($"Seed = {seed}, Size = {weave.size}, Complexity = {colorComplexity}\nPress any ENTER to regenerate, press ESC to leave, press h for controls");
+        Console.Write($"Seed = {seed}, Size = {weave.size}, Complexity = {colorComplexity}, Style = {styleFlag}\nPress any ENTER to regenerate, press ESC to leave, press h for controls");
 
     }
 }

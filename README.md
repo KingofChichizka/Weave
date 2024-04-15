@@ -1,5 +1,4 @@
 # Console Weave Pattern Generator
-
 This C# code generates and displays a weave pattern in the console window.
 
 ## Table of Contents
@@ -23,9 +22,8 @@ The program runs in an infinite loop until the user exits by pressing the ESC ke
 - **ENTER:** Regenerates the pattern
 - **ESC:** Exits the program
 - **H:** Displays controls
-- **C:** Toggles color visibility
-- **D:** Toggles pattern dotting visibility
 - **R:** Displays window size settings
+- **F** Cycle through style flags
 
 ## Classes
 
@@ -54,11 +52,16 @@ public class Settings
 {
     public static int width;                            // Size of the window
     public static int height;
-    public static bool DottingVisibility;               // Flag to allow dotted tiles 
-    public static bool ColorVisibility;                 // Flag for color/black-white
     public static int patternSize;                      // Size of the pattern
     public static int colorComplexity;                  // Amount of colors
     public static int seed;                             // Seed for the Random
+    public static StyleFlag styleFlag;                  // Flag for styling
+    public enum StyleFlag
+    {
+        Normal,
+        NotDotted,
+        NotColored
+    }
 }
 ```
 ### Variables
