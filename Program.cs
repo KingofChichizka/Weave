@@ -11,7 +11,7 @@ while (true)
     patternSize = random.Next(2, 14);
     colorComplexity = random.Next(2, 15);
     seed = random.Next();
-    weave = new Weave(patternSize, colorComplexity, seed);
+    weave = new Weave(type, patternSize, colorComplexity, seed);
     pattern = weave.ReconstructPattern();
 
     // Generate unique colors
@@ -29,6 +29,7 @@ while (true)
         ConsoleKey pressedKey = Console.ReadKey().Key;
         if (pressedKey == ConsoleKey.Escape) return;
         else if (pressedKey == ConsoleKey.Enter) break;
+        else if (pressedKey == ConsoleKey.T) { type++; if ((int)type >= 3) type = 0; }
         else if (pressedKey == ConsoleKey.D) { styleFlag++; if ((int)styleFlag >= 3) styleFlag = 0; }
         // else if (pressedKey == ConsoleKey.R) DisplayWindowSizeSettings();                                                //TODO resizing window
         else if (pressedKey == ConsoleKey.S) SaveSvg();                                                                     //TODO saving window 
@@ -39,9 +40,16 @@ public class Weave
 {
     public int size; // Stores the size of the weave
     public int[] pattern; // Stores the pattern of the weave
+    public Type type; //Stores the type of the weave
+    public enum Type 
+    {
+        Square,
+        Rhomb,
+        Periodic
+    };
 
     // Constructor for the Weave class
-    public Weave(int size = -1, int complexity = -1, int seed = -1)
+    public Weave(Type type, int size = -1, int complexity = -1, int seed = -1)
     {
         Random random = seed != -1 ? new Random(seed) : new Random();
 
@@ -49,9 +57,17 @@ public class Weave
         this.size = size == -1 ? random.Next(2, 16) : size;
 
         // Set the complexity to the provided value or a random value between 2 and 5
-        complexity = complexity == -1 ? random.Next(2, 5) : complexity;
+        if (type != Type.Periodic) complexity = complexity == -1 ? random.Next(2, 5) : complexity;
+        else complexity = 2;
 
-        pattern = new int[CalculateFactorial(size)];
+        this.type = type;
+
+        switch (type) 
+        {
+            case Type.Square: { pattern = new int[CalculateFactorial(size)]; } break;
+            case Type.Rhomb: { pattern = new int[CalculateDiagonal(size)]; } break;
+            case Type.Periodic: { pattern = new int[size*size]; } break;
+        }
 
         // Assign random values to each element in the pattern array
         for (int i = 0; i < pattern.Length; i++)
@@ -59,19 +75,29 @@ public class Weave
             pattern[i] = random.Next(complexity);
         }
     }
-
-    // Method to reconstruct the pattern into a 2D array representing the woven pattern
+    // Method to choose a way of reconstructing an array, depending on a pattern's type
     public int[,] ReconstructPattern()
     {
-        int[,] tile = new int[(size * 2) - 1, (size * 2) - 1];
+        switch (type) 
+        {
+            case Type.Square: { return ReconstructPatternSquare(); } break;
+            case Type.Rhomb: { return ReconstructPatternRhomb(); } break;
+            case Type.Periodic: { return ReconstructPatternPeriodic(); } break;
+            default: { return null; } break;
+        }
+    }
+    // Method to reconstruct the pattern into a 2D array representing the woven square pattern
+    private int[,] ReconstructPatternSquare()
+    {
+        int[,] tile = new int[(size * 2) - 2, (size * 2) - 2];
 
         // Set the central tile of the pattern array in the 2D tile array
         tile[size - 1, size - 1] = pattern[0];
 
         // Loop through each cell of the 2D tile array
-        for (int i = 0; i < ((size * 2) - 1); i++)
+        for (int i = 0; i < ((size * 2) - 2); i++)
         {
-            for (int j = 0; j < ((size * 2) - 1); j++)
+            for (int j = 0; j < ((size * 2) - 2); j++)
             {
                 int I = Math.Abs(i - size + 1);
                 int J = Math.Abs(j - size + 1);
@@ -82,6 +108,65 @@ public class Weave
                 else
                 {
                     tile[i, j] = pattern[CalculateFactorial(J) + I];
+                }
+            }
+        }
+
+        return tile;
+    }
+    // Method to reconstruct the pattern into a 2D array representing the woven periodic houdstooth-esque pattern
+    private int[,] ReconstructPatternPeriodic()
+    {
+        int[,] tile = new int[(size * 2), (size * 2)];
+
+        // Set the central tile of the pattern array in the 2D tile array
+        tile[size - 1, size - 1] = pattern[0];
+
+        // Loop through each cell of the 2D tile array
+        for (int i = 0; i < size*2; i++)
+        {
+            for (int j = 0; j < size * 2; j++)
+            {
+                int I = Math.Abs(i % size);
+                int J = Math.Abs(j % size);
+                if ((i<size && j<size) || (i>=size && j>=size))
+                {
+                    tile[i, j] = pattern[J+(I*size)];
+                }
+                else
+                {
+                    tile[i, j] = CalculateReverse(pattern[J + (I * size)]);
+                }
+            }
+        }
+        return tile;
+    }
+    // Method to reconstruct the pattern into a 2D array representing the woven rhombic pattern
+    private int[,] ReconstructPatternRhomb()
+    {
+        int[,] tile = new int[(size * 2) - 2, (size * 2) - 2];
+
+        // Set the central tile of the pattern array in the 2D tile array
+        tile[size - 1, size - 1] = pattern[0];
+
+        // Loop through each cell of the 2D tile array
+        for (int i = 0; i < ((size * 2) - 2); i++)
+        {
+            for (int j = 0; j < ((size * 2) - 2); j++)
+            {
+                int I = size-1-Math.Abs(i - size + 1);
+                int II = Math.Abs(i - size + 1);
+                int J = size-1-Math.Abs(j - size + 1);
+                int JJ = Math.Abs(j - size + 1);
+                if (I >= J)
+                {
+                    if(CalculateDiagonal(I + J) + J <= CalculateDiagonal(size)-1) tile[i, j] = pattern[CalculateDiagonal(I+J) + J];
+                    else tile[i, j] = pattern[CalculateDiagonal(II+JJ) + II];
+                }
+                else
+                {
+                    if (CalculateDiagonal(I + J) + I <= CalculateDiagonal(size) - 1) tile[i, j] = pattern[CalculateDiagonal(I + J) + I];
+                    else tile[i, j] = pattern[CalculateDiagonal(II+JJ) + JJ];
                 }
             }
         }
@@ -109,6 +194,26 @@ public class Weave
         }
         return sum;
     }
+    // Method to calculate the diagonal position of a number
+    private int CalculateDiagonal(int number)
+    {
+        if (number > 0)
+        {
+            int sum = 1;
+            for (int i = 1; i < number; i++)
+            {
+                sum += (i / 2) + 1;
+            }
+            return sum;
+        }
+        else return 0;
+    }
+    // Method to calculate the reverse of a number
+    private int CalculateReverse(int number) 
+    {
+        if (number == 0) return 1;
+        else return 0;
+    }
 
 }
 public class Settings
@@ -120,6 +225,7 @@ public class Settings
     public static int patternSize = -1;
     public static int colorComplexity = -1;
     public static int seed = -1;
+    public static Weave.Type type = 0;
     public enum StyleFlag
     {
         Normal,
@@ -146,10 +252,10 @@ public class Windows
         {
             for (int j = 0; j < width; j++)
             {
-                if (styleFlag != StyleFlag.NotColored) patterntemplate += $"[{(int)selectedColors[pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)]]}]";
+                if (styleFlag != StyleFlag.NotColored) patterntemplate += $"[{(int)selectedColors[pattern[i % ((int)Math.Sqrt(pattern.Length)), j % ((int)Math.Sqrt(pattern.Length))]]}]";
                 if (styleFlag != StyleFlag.NotDotted)
                 {
-                    switch (pattern[i % ((weave.size * 2) - 2), j % ((weave.size * 2) - 2)] % 4)
+                    switch (pattern[i % ((int)Math.Sqrt(pattern.Length)), j % ((int)Math.Sqrt(pattern.Length))] % 4)
                     {
                         case 0: patterntemplate += "▓"; break;
                         case 1: patterntemplate += "░"; break;
@@ -182,22 +288,24 @@ public class Windows
         layout["info"].Ratio(1);
         layout["info"]["properties"].Update(new Panel(new Markup($"[red]Seed[/]: {seed}\n[red]Complexity[/]: {colorComplexity}\n[red]Size[/]: {patternSize}")).RoundedBorder().Header(" Info ").Expand());
         layout["info"]["properties"].Ratio(1);
-        layout["info"]["controls"].Update(new Panel(new Markup($"[red]D[/]: Display mode: {styleFlagUserNames[(int)styleFlag]}\n\n[red]S[/]: Save pattern")).RoundedBorder().Header(" Controls "));
+        layout["info"]["controls"].Update(new Panel(new Markup($"[red]ESC[/]: Finish\n[red]ENTER[/]: Generate new pattern\n[red]T[/]: Pattern type: [darkKhaki]{type.ToString()}[/]\n[red]D[/]: Display mode: [darkKhaki]{styleFlagUserNames[(int)styleFlag]}[/]\n\n[red]S[/]: Save pattern")).RoundedBorder().Header(" Controls "));
         layout["info"]["controls"].Ratio(2);
         AnsiConsole.Write(layout);
     }
 }
 public class AdditionalFunctions
 {
+    //Saves weave as a txt file
     public static void SaveTxt()
     {
         Directory.CreateDirectory("Saved");
-        using (FileStream fs = File.Create($@"Saved\w_{seed}_{patternSize}_{colorComplexity}.txt"))
+        using (FileStream fs = File.Create($@"Saved\{type.ToString()}_{seed}_{patternSize}_{colorComplexity}.txt"))
         {
-            Byte[] title = new UTF8Encoding(true).GetBytes($"{seed} {patternSize} {colorComplexity} {weave.OutputPatternAsString()}");
+            Byte[] title = new UTF8Encoding(true).GetBytes($"{(int)type} {seed} {patternSize} {colorComplexity} {weave.OutputPatternAsString()}");
             fs.Write(title, 0, title.Length);
         }
     }
+    //Saves weave as an svg file
     public static void SaveSvg()                                                                                                    //FIXME 
     {
         string[] fills ={
@@ -219,8 +327,8 @@ public class AdditionalFunctions
             "#ffffff"  // white
         };
         Directory.CreateDirectory("Saved");
-        File.Create($"./Saved/w_{seed}_{patternSize}_{colorComplexity}.svg").Close();
-        using (StreamWriter fileWriter = new StreamWriter($@"./Saved/w_{seed}_{patternSize}_{colorComplexity}.svg"))
+        File.Create($"./Saved/{type.ToString()}_{seed}_{patternSize}_{colorComplexity}.svg").Close();
+        using (StreamWriter fileWriter = new StreamWriter($@"./Saved/{type.ToString()}_{seed}_{patternSize}_{colorComplexity}.svg"))
         {
             fileWriter.WriteLine($"<svg viewBox='0 0 {width * 10} {height * 16}' xmlns='http://www.w3.org/2000/svg'>");
 
