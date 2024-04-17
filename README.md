@@ -11,6 +11,7 @@ This C# code generates and displays a weave pattern in the console window.
     - [Settings](#settings)
     - [Variables](#variables)
     - [Windows](#windows)
+    - [AdditionalFunctions](#additionalfunctions)
 
 ## Introduction
 
@@ -18,12 +19,11 @@ The program generates a weave pattern using specified settings such as pattern s
 
 ## Usage
 
-The program runs in an infinite loop until the user exits by pressing the ESC key. During each iteration, it generates a new weave pattern based on the provided or random settings. The user can interact with the program by pressing keys:
+The program generates a weave pattern using specified settings such as pattern size, color complexity, and seed. It displays the pattern in the console window, allowing the user to toggle color visibility, pattern dotting, and resize the window.
 - **ENTER:** Regenerates the pattern
 - **ESC:** Exits the program
-- **H:** Displays controls
-- **R:** Displays window size settings
-- **F** Cycle through style flags
+- **D:** Cycle through display modes: Dotted, Colored -> Colored -> Dotted
+- **S:** Save the pattern as an SVG file
 
 ## Classes
 
@@ -32,8 +32,8 @@ The program runs in an infinite loop until the user exits by pressing the ESC ke
 ```csharp
 public class Weave
 {
-    public int size;                        // Stores the size of the weave
-    public int[] pattern;                   // Stores the pattern of the weave
+    public int size;                                    // Stores the size of the weave
+    public int[] pattern;                               // Stores the pattern of the weave
 
     // Constructor for the Weave class
     public Weave(int size = -1, int complexity = -1, int seed = -1)
@@ -55,12 +55,13 @@ public class Settings
     public static int patternSize;                      // Size of the pattern
     public static int colorComplexity;                  // Amount of colors
     public static int seed;                             // Seed for the Random
+    public static string[] styleFlagUserNames;          // Array of names displayed in UI 
     public static StyleFlag styleFlag;                  // Flag for styling
     public enum StyleFlag
     {
-        Normal,
-        NotDotted,
-        NotColored
+        Normal,                                         // Display with both color and dots.
+        NotDotted,                                      // Display without dots.
+        NotColored                                      // Display without color.
     }
 }
 ```
@@ -80,8 +81,14 @@ public class Variables
 ```csharp
 public class Windows
 {
-    public static void DisplayWindowSizeSettings()      // Method to display window size settings
-    public static void DisplayControls()                // Method to display controls
     public static void DisplayPattern()                 // Method to display the weave pattern
 }
 ```
+### AdditionalFunctions
+
+```csharp
+public class AdditionalFunctions
+{
+    public static void SaveTxt()                        // Method to save pattern as text file
+    public static void SaveSvg()                        // Method to save pattern as SVG file
+}
