@@ -128,10 +128,6 @@ public class Weave
     private int[,] ReconstructPatternPeriodic()
     {
         int[,] tile = new int[(size * 2), (size * 2)];
-
-        // Set the central tile of the pattern array in the 2D tile array
-        tile[size - 1, size - 1] = pattern[0];
-
         // Loop through each cell of the 2D tile array
         for (int i = 0; i < size * 2; i++)
         {
@@ -255,9 +251,16 @@ public class Windows
     public static int lastWidth = width; // Last recorded widht
     public static int lastHeight = height; // Last recorded height
     public static int msNotResized = 0; // How long window wasn't resized
+    public static WindowType currentWindow; // Current type of window
+    public enum WindowType
+    {
+        PatternWindow,
+        ResizeWindow,
+    }
 
     public static void DisplayPattern()
     {
+        currentWindow = WindowType.PatternWindow;
         AnsiConsole.Clear();
         UpdateWindowSize();
         // Create pattern string
@@ -280,6 +283,7 @@ public class Windows
                 else patterntemplate += "█";
                 if (styleFlag != StyleFlag.NotColored) patterntemplate += "[/]";
             }
+            patterntemplate += "\n";
         }
         // Display
         // Create the layout
@@ -308,6 +312,7 @@ public class Windows
     }
     public static void DisplayResizeWindow()
     {
+        currentWindow = WindowType.ResizeWindow;
         AnsiConsole.Clear();
         AnsiConsole.Write(new Layout("Root").Update(new Panel(Align.Center(new Markup($"{Console.WindowWidth}x{Console.WindowHeight}"), VerticalAlignment.Middle)).RoundedBorder().Expand()));
     }
@@ -328,7 +333,7 @@ public class Windows
             Thread.Sleep(25);
             if (msNotResized == 2000)
             {
-                DisplayPattern();
+                if(currentWindow == WindowType.ResizeWindow) DisplayPattern();
             }
         }
     }
@@ -387,7 +392,7 @@ public class AdditionalFunctions
     // Updates the size of a pattern window
     public static void UpdateWindowSize()
     {
-        width = Console.WindowWidth * 5 / 6 - 4;
+        width = (Console.WindowWidth > 120) ? Console.WindowWidth * 5 / 6 - 4 : Console.WindowWidth - 20 - 4;
         height = Console.WindowHeight - 2;
     }
     // Logs errors in Markdown

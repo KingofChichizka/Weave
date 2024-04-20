@@ -23,7 +23,7 @@ The program generates a weave pattern using specified settings such as pattern s
 
 ## Usage
 
-The program generates a weave pattern using specified settings such as pattern size, color complexity, and seed. It displays the pattern in the console window, allowing the user to toggle color visibility, pattern dotting, and resize the window.
+The program generates a weave pattern using specified settings such as pattern size, color complexity, and seed. It displays the pattern in the console window, allowing the user to toggle color visibility, pattern dotting and weave type.
 
 - **ENTER:** Regenerates the pattern
 - **ESC:** Exits the program
@@ -104,6 +104,12 @@ public class Windows
     public static int lastWidth = width;                // Last recorded widht
     public static int lastHeight = height;              // Last recorded height
     public static int msNotResized = 0;                 // How long window wasn't resized
+    public static WindowType currentWindow; 		// Current type of window
+    public enum WindowType
+{
+    PatternWindow,
+    ResizeWindow,
+}
     public static void DisplayPattern();                // Method to display the weave pattern
     public static void DisplayResizeWindow();           // Method to display the resize window
     public static void ResizeListener();                // Listener for window resize events
